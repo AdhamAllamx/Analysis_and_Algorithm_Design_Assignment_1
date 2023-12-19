@@ -11,44 +11,40 @@ public class SequenceAlignment {
         for (int i = 0; i < nucleotides.length; i++) {
             charToIndexMap.put(nucleotides[i], i);
         }
-        double[][] scoreMatrix = new double[n + 1][m + 1];
+        double[][] derivedScoreMatrix = new double[n+1][m+1];
 
         for (int i=0; i<=n; i++) {
             for (int j= 0; j<=m; j++) {
                 if (i ==0 || j ==0) {
-                    scoreMatrix[i][j] = 0.0;
+                    derivedScoreMatrix[i][j] = 0.0;
                 } else {
-                    double matchedScore = scoreMatrix[i-1][j-1] + scoringMatrix[charToIndexMap.get(x.charAt(i-1))][charToIndexMap.get(y.charAt(j-1))];
-                    double dashXScore = scoreMatrix[i-1][j] + scoringMatrix[charToIndexMap.get(x.charAt(i-1))][charToIndexMap.get('-')];
-                    double dashYScore = scoreMatrix[i][j - 1] +scoringMatrix[charToIndexMap.get('-')][charToIndexMap.get(y.charAt(j-1))];
+                    double matchedScore = derivedScoreMatrix[i-1][j-1] + scoringMatrix[charToIndexMap.get(x.charAt(i-1))][charToIndexMap.get(y.charAt(j-1))];
+                    double dashXScore = derivedScoreMatrix[i-1][j] + scoringMatrix[charToIndexMap.get(x.charAt(i-1))][charToIndexMap.get('-')];
+                    double dashYScore = derivedScoreMatrix[i][j - 1] +scoringMatrix[charToIndexMap.get('-')][charToIndexMap.get(y.charAt(j-1))];
 //                    if( i == 1 && j == 1) {
 //                    	System.out.println(matchedScore);
 //                    	System.out.println(dashXScore);
 //                    	System.out.println(dashYScore);
 //                    }
-                    scoreMatrix[i][j] = Math.max((Math.max(matchedScore, dashXScore)), dashYScore);
-                    System.out.println("The score in i = " + i + " and j = " + j + " is: " + scoreMatrix[i][j]);
+                    derivedScoreMatrix[i][j] = Math.max((Math.max(matchedScore, dashXScore)), dashYScore);
+                    System.out.println("The score in i = " + i + " and j = " + j + " is: " + derivedScoreMatrix[i][j]);
                 }
             }
         }
         
         StringBuilder row_X = new StringBuilder();
         StringBuilder row_Y = new StringBuilder();
-  
-
         int i = n, j = m;
 
         while (i > 0 || j > 0) {
-//        	System.out.println("Aligned x till now: " + row_X);
-//        	System.out.println("Aligned y till now: " + row_Y);
-//        	System.out.println();
-            if (i > 0 && j > 0 && scoreMatrix[i][j] == scoreMatrix[i-1][j-1] +scoringMatrix[charToIndexMap.get(x.charAt(i-1))][charToIndexMap.get(y.charAt(j-1))]) {
+
+            if (i > 0 && j > 0 && derivedScoreMatrix[i][j] == derivedScoreMatrix[i-1][j-1] +scoringMatrix[charToIndexMap.get(x.charAt(i-1))][charToIndexMap.get(y.charAt(j-1))]) {
             	 row_X.insert(0, x.charAt(i-1));
             	row_Y.insert(0, y.charAt(j-1));
                 i--;
                 j--;
 
-            } else if (i > 0 && scoreMatrix[i][j] == scoreMatrix[i-1][j]+scoringMatrix[charToIndexMap.get(x.charAt(i-1))][charToIndexMap.get('-')]) {
+            } else if (i > 0 && derivedScoreMatrix[i][j] == derivedScoreMatrix[i-1][j]+scoringMatrix[charToIndexMap.get(x.charAt(i-1))][charToIndexMap.get('-')]) {
             	 row_X.insert(0, x.charAt(i-1));
             	row_Y.insert(0, '-');
                 i--;
@@ -59,15 +55,14 @@ public class SequenceAlignment {
                 j--;
             }
         }
-        System.out.println("Aligned x: " + row_X.toString());
-        System.out.println("Aligned y: " + row_Y.toString());
+//        System.out.println("Aligned x: " + row_X.toString());
+//        System.out.println("Aligned y: " + row_Y.toString());
         String[] result = new String[2];
         result[0]= row_X.toString();
         result[1]= row_Y.toString();
-        
-
         return result;
     }
+    //created for testing the final and score and compare it with output in the assignment  
     private static double calculateAlignmentScore(String x, String y, Double[][] scoringMatrix) {
         double score = 0.0;
         char[] nucleotides = {'A', 'G', 'T', 'C', '-'};
@@ -79,18 +74,8 @@ public class SequenceAlignment {
             char charX = x.charAt(i);
             char charY = y.charAt(i);
             int indexX, indexY;
-
-            if (charX == '-') {
-                indexX = 4;
-            } else {
-                indexX = charToIndexMap.get(charX);
-            }
-
-            if (charY == '-') {
-                indexY = 4;
-            } else {
-                indexY = charToIndexMap.get(charY);
-            }
+            indexX = charToIndexMap.get(charX);
+            indexY = charToIndexMap.get(charY);
 
             score += scoringMatrix[indexX][indexY];
         }
@@ -100,6 +85,8 @@ public class SequenceAlignment {
     public static void main(String[] args) {
         String x = "TCCCAGTTATGTCAGGGGACACGAGCATGCAGAGAC";
       String y = "AATTGCCGCCGTCGTTTTCAGCAGTTATGTCAGATC";
+//         String x = "ATGCC";
+//         String y = "TACGCA";
 
 
         Double[][] scoringMatrix = {
@@ -116,6 +103,7 @@ public class SequenceAlignment {
          }
 //         String x1 = "--T--CC-C-AGT--TATGT-CAGGGGACACG-A-GCATGCAGA-GAC";
 //         String y2 = "AATTGCCGCC-GTCGT-T-TTCAG----CA-GTTATG-T-CAGAT--C";
+         //created this method in order to caluclate the final score and test 
          double alignmentScore = calculateAlignmentScore(result[0], result[1], scoringMatrix);
 //         double alignmentScore2 = calculateAlignmentScore(x1, y2, scoringMatrix);
 
