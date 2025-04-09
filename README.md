@@ -1,1 +1,1 @@
-# Analysis_and_Algorithm_Design_Assignment_1
+# Analysis_and_Desgin_Algorithms
